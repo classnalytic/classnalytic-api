@@ -1,10 +1,8 @@
-const uuid = require('uuid/v4')
-
 module.exports = (sequelize, type) => {
   return sequelize.define('attendance', {
     id: {
       type: type.UUID,
-      defaultValue: uuid(),
+      defaultValue: sequelize.literal('uuid_generate_v4()'),
       primaryKey: true
     },
     userId: { type: type.UUID },

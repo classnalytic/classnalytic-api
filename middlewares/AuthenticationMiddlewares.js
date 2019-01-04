@@ -24,7 +24,19 @@ module.exports = (req, res, next) => {
           })
         }
 
-        res.sendStatus(403)
+        if (err.name === 'JsonWebTokenError') {
+          return res.json({
+            error: true,
+            name: err.name,
+            message: err.message,
+            expiredAt: err.expiredAt
+          })
+        }
+
+        return res.json({
+          error: true,
+          name: 'Unauthorized'
+        })
       } else {
         next()
       }
@@ -33,6 +45,9 @@ module.exports = (req, res, next) => {
     next()
   } else {
     // If header is undefined return Forbidden (403)
-    res.sendStatus(403)
+    return res.json({
+      error: true,
+      name: 'Unauthorized'
+    })
   }
 }

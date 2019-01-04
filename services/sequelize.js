@@ -18,6 +18,8 @@ const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASS, {
   operatorsAliases: false
 })
 
+sequelize.query('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"', { raw: true })
+
 // Use model
 const Users = UsersModel(sequelize, Sequelize)
 const Classrooms = ClassroomsModel(sequelize, Sequelize)

@@ -1,10 +1,8 @@
-const uuid = require('uuid/v4')
-
 module.exports = (sequelize, type) => {
   return sequelize.define('users', {
     id: {
       type: type.UUID,
-      defaultValue: uuid(),
+      defaultValue: sequelize.literal('uuid_generate_v4()'),
       primaryKey: true
     },
     username: { type: type.STRING, notEmpty: true },
@@ -13,6 +11,9 @@ module.exports = (sequelize, type) => {
     firstname: { type: type.TEXT, notEmpty: true },
     lastname: { type: type.TEXT, notEmpty: true },
     enabled: { type: type.BOOLEAN, defaultValue: true },
-    role: { type: type.ENUM('teacher', 'student', 'admin'), defaultValue: 'student' }
+    role: {
+      type: type.ENUM('teacher', 'student', 'admin'),
+      defaultValue: 'student'
+    }
   })
 }
