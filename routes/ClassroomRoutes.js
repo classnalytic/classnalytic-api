@@ -20,7 +20,7 @@ const {
 router.use(AuthticationMiddleware)
 
 router.post('/', async (req, res) => {
-  let user = req.user
+  let user = req.info
   let classrooms = await Enrolls.findAll({
     where: { userId: user.id },
     order: ['createdAt'],
@@ -63,7 +63,9 @@ router.post('/save', async (req, res) => {
 
     let emotions = student.emotions
 
-    let emotion = Object.keys(emotions).reduce((a, b) => (emotions[a] > emotions[b] ? a : b))
+    let emotion = Object.keys(emotions).reduce((a, b) =>
+      emotions[a] > emotions[b] ? a : b
+    )
 
     let action = student.action
 
@@ -72,7 +74,10 @@ router.post('/save', async (req, res) => {
         userId: user.id,
         classroomId: id,
         time: {
-          [Op.between]: [new Date(today + ' 00:00:00'), new Date(today + ' 23:59:59')]
+          [Op.between]: [
+            new Date(today + ' 00:00:00'),
+            new Date(today + ' 23:59:59')
+          ]
         }
       }
     })
@@ -123,11 +128,22 @@ router.post('/create', async (req, res) => {
   let startTime = req.body.startTime
   let endTime = req.body.endTime
 
-  let classroomId = await Classrooms.create({ id: uuid(), roomId, subjectId, startTime, endTime })
+  let classroomId = await Classrooms.create({
+    id: uuid(),
+    roomId,
+    subjectId,
+    startTime,
+    endTime
+  })
     .then(r => r.get('id'))
     .catch(e => console.log(e))
 
-  await Enrolls.create({ id: uuid(), userId: instructorId, classroomId, role: 'admin' }).catch(e => console.log(e))
+  await Enrolls.create({
+    id: uuid(),
+    userId: instructorId,
+    classroomId,
+    role: 'admin'
+  }).catch(e => console.log(e))
 
   return res.send({ classroomId })
 })
@@ -153,7 +169,10 @@ router.post('/:id', async (req, res) => {
         where: {
           classroomId: id,
           createdAt: {
-            [Op.between]: [new Date(today + ' 00:00:00'), new Date(today + ' 23:59:59')]
+            [Op.between]: [
+              new Date(today + ' 00:00:00'),
+              new Date(today + ' 23:59:59')
+            ]
           }
         },
         order: [['createdAt', 'DESC']],
@@ -167,7 +186,10 @@ router.post('/:id', async (req, res) => {
         where: {
           classroomId: id,
           createdAt: {
-            [Op.between]: [new Date(today + ' 00:00:00'), new Date(today + ' 23:59:59')]
+            [Op.between]: [
+              new Date(today + ' 00:00:00'),
+              new Date(today + ' 23:59:59')
+            ]
           }
         },
         group: ['emotion'],
@@ -186,10 +208,14 @@ router.post('/:id', async (req, res) => {
       }
 
       if (emotions.length !== 0) {
-        let total = emotions.map(e => parseInt(e.dataValues.count)).reduce((a, b) => a + b)
+        let total = emotions
+          .map(e => parseInt(e.dataValues.count))
+          .reduce((a, b) => a + b)
 
         await emotions.forEach(emotion => {
-          percent[emotion.emotion] = parseFloat((parseInt(emotion.dataValues.count) / total) * 100).toFixed(2)
+          percent[emotion.emotion] = parseFloat(
+            (parseInt(emotion.dataValues.count) / total) * 100
+          ).toFixed(2)
         })
       }
 
@@ -197,7 +223,10 @@ router.post('/:id', async (req, res) => {
         where: {
           classroomId: id,
           createdAt: {
-            [Op.between]: [new Date(today + ' 00:00:00'), new Date(today + ' 23:59:59')]
+            [Op.between]: [
+              new Date(today + ' 00:00:00'),
+              new Date(today + ' 23:59:59')
+            ]
           }
         },
         order: [['createdAt', 'DESC']],
@@ -207,7 +236,13 @@ router.post('/:id', async (req, res) => {
         }
       })
 
-      return { ...data.toJSON(), actions, emotions: percent, attendances, found: true }
+      return {
+        ...data.toJSON(),
+        actions,
+        emotions: percent,
+        attendances,
+        found: true
+      }
     })
     .catch(() => ({ found: false }))
 
@@ -222,7 +257,10 @@ router.post('/:id/report', async (req, res) => {
     where: {
       classroomId: id,
       createdAt: {
-        [Op.between]: [new Date(date + ' 00:00:00'), new Date(date + ' 23:59:59')]
+        [Op.between]: [
+          new Date(date + ' 00:00:00'),
+          new Date(date + ' 23:59:59')
+        ]
       }
     },
     order: [['createdAt', 'DESC']],
@@ -236,7 +274,10 @@ router.post('/:id/report', async (req, res) => {
     where: {
       classroomId: id,
       createdAt: {
-        [Op.between]: [new Date(date + ' 00:00:00'), new Date(date + ' 23:59:59')]
+        [Op.between]: [
+          new Date(date + ' 00:00:00'),
+          new Date(date + ' 23:59:59')
+        ]
       }
     },
     group: ['emotion'],
@@ -255,10 +296,14 @@ router.post('/:id/report', async (req, res) => {
   }
 
   if (emotions.length !== 0) {
-    let total = emotions.map(e => parseInt(e.dataValues.count)).reduce((a, b) => a + b)
+    let total = emotions
+      .map(e => parseInt(e.dataValues.count))
+      .reduce((a, b) => a + b)
 
     await emotions.forEach(emotion => {
-      percent[emotion.emotion] = parseFloat((parseInt(emotion.dataValues.count) / total) * 100).toFixed(2)
+      percent[emotion.emotion] = parseFloat(
+        (parseInt(emotion.dataValues.count) / total) * 100
+      ).toFixed(2)
     })
   }
 
@@ -266,7 +311,10 @@ router.post('/:id/report', async (req, res) => {
     where: {
       classroomId: id,
       createdAt: {
-        [Op.between]: [new Date(date + ' 00:00:00'), new Date(date + ' 23:59:59')]
+        [Op.between]: [
+          new Date(date + ' 00:00:00'),
+          new Date(date + ' 23:59:59')
+        ]
       }
     },
     order: [['createdAt', 'DESC']],
