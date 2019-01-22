@@ -33,6 +33,7 @@ const Actions = ActionsModel(sequelize, Sequelize)
 // Join Classroom to Subjects, Rooms, Enrolls, Emotions, Actions and Attendance
 Classrooms.belongsTo(Subjects, { foreignKey: 'subjectId' })
 Classrooms.belongsTo(Rooms, { foreignKey: 'roomId' })
+Classrooms.belongsTo(Users, { foreignKey: 'instructorId' })
 Classrooms.hasMany(Enrolls, { foreignKey: 'classroomId', sourceKey: 'id' })
 Classrooms.hasMany(Emotions, { foreignKey: 'classroomId', sourceKey: 'id' })
 Classrooms.hasMany(Actions, { foreignKey: 'classroomId', sourceKey: 'id' })

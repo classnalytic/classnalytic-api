@@ -17,17 +17,10 @@ app.use(
     extended: true
   })
 )
+
+// Cookie Parser
 app.use(cookieParser())
 
-// app.use(
-//   cookieSession({
-//     maxAge: 12 * 60 * 60 * 1000,
-//     keys: ['lel'],
-//     cookie: {
-//       secure: true
-//     }
-//   })
-// )
 // Initialize passport.js
 app.use(passport.initialize())
 // app.use(passport.session())

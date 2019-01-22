@@ -20,7 +20,7 @@ router.post('/all', async (req, res) => {
 
 router.post('/classroom', async (req, res) => {
   let classroomId = req.body.classroomId
-  let studentId = req.user.id
+  let studentId = req.info.id
 
   let attendances = await Attendance.findAll({
     where: {
@@ -40,7 +40,7 @@ router.post('/classroom', async (req, res) => {
 router.post('/:id', async (req, res) => {
   let id = req.params.id
 
-  let user = await Users.findById(id)
+  let user = await Users.findByPk(id)
     .then(data => {
       if (!data) {
         return { found: false }

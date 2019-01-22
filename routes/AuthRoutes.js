@@ -1,13 +1,13 @@
 const express = require('express')
 const passport = require('passport')
 
-const jwt = require('jsonwebtoken')
-
 const router = express.Router()
 
 const AuthenticationMiddleware = require('../middlewares/AuthenticationMiddlewares')
 
-const { JWT_SECRET, COOKIE_DOMAIN } = require('../config')
+const { createTokens } = require('../services/token')
+
+const { COOKIE_DOMAIN } = require('../config')
 
 router.get('/', AuthenticationMiddleware, (req, res) => {
   res.json({
@@ -31,11 +31,14 @@ router.post('/', (req, res, next) => {
         return next(err)
       }
 
-      const body = { ...user }
-      // Sign the JWT token and populate the payload with the user email and id
-      const token = jwt.sign({ user: body }, JWT_SECRET, { expiresIn: '1h' })
+      const [token, refreshToken] = createTokens(user)
 
       res.cookie('token', token, {
+        domain: COOKIE_DOMAIN,
+        secure: true
+      })
+
+      res.cookie('refreshToken', refreshToken, {
         domain: COOKIE_DOMAIN,
         secure: true
       })
@@ -53,6 +56,8 @@ router.post('/', (req, res, next) => {
 
 router.post('/logout', (req, res) => {
   res.clearCookie('token')
+  res.clearCookie('refreshToken')
+
   return res.json({
     success: true
   })

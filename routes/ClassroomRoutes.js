@@ -21,6 +21,7 @@ router.use(AuthticationMiddleware)
 
 router.post('/', async (req, res) => {
   let user = req.info
+
   let classrooms = await Enrolls.findAll({
     where: { userId: user.id },
     order: ['createdAt'],
@@ -148,14 +149,32 @@ router.post('/create', async (req, res) => {
   return res.send({ classroomId })
 })
 
+router.post('/edit', async (req, res) => {
+  console.log(req.body)
+
+  const { id, subject, room, startTime, endTime } = req.body
+
+  let classroom = await Classrooms.findByPk(id)
+
+  classroom.subjectId = subject
+  classroom.roomId = room
+  classroom.startTime = startTime
+  classroom.endTime = endTime
+
+  classroom.save()
+
+  return res.send({ success: true })
+})
+
 router.post('/:id', async (req, res) => {
   let id = req.params.id
 
-  let classroom = await Classrooms.findById(id, {
+  let classroom = await Classrooms.findByPk(id, {
     include: [Subjects, Rooms]
   })
     .then(async data => {
       if (!data) {
+        console.log(data)
         return { found: false }
       }
 
